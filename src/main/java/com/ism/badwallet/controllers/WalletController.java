@@ -30,4 +30,9 @@ public class WalletController {
         walletService.seedDatabase(numWallets, eventsPerWallet);
         return ResponseEntity.accepted().body("Le seeding de la base de données a démarré de manière asynchrone.");
     }
+    
+    @PostMapping
+    public ResponseEntity<Wallet> create(@RequestBody com.ism.badwallet.dtos.WalletCreationRequest request) {
+        return ResponseEntity.ok(walletService.createWallet(request));
+    }
 }

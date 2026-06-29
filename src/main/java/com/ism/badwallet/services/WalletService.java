@@ -1,5 +1,6 @@
 package com.ism.badwallet.services;
 
+
 import com.ism.badwallet.dtos.DepositRequest;
 import com.ism.badwallet.dtos.WithdrawRequest;
 import com.ism.badwallet.entities.*;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import com.ism.badwallet.dtos.WalletCreationRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -97,5 +99,17 @@ public class WalletService {
                 transactionRepository.save(tx);
             }
         }
+    }
+    public Wallet createWallet(WalletCreationRequest request) {
+       
+        Wallet wallet = Wallet.builder()
+                .phoneNumber(request.getPhoneNumber())
+                .email(request.getEmail())
+                .balance(request.getInitialBalance())
+                .code(request.getCode())
+                .currency(request.getCurrency())
+                .build();
+                
+        return walletRepository.save(wallet);
     }
 }
