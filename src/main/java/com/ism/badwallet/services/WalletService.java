@@ -67,4 +67,35 @@ public class WalletService {
 
         return walletRepository.save(wallet);
     }
+    @org.springframework.scheduling.annotation.Async
+    public void seedDatabase(int numWallets, int eventsPerWallet) {
+        java.util.Random random = new java.util.Random();
+        
+        for (int i = 1; i <= numWallets; i++) {
+            String phone = "+221770000" + String.format("%03d", i);
+            
+            
+            Wallet wallet = Wallet.builder()
+                    .phoneNumber(phone)
+                    .email("user" + i + "@ism.edu.sn")
+                    .balance(new BigDecimal("100000")) 
+                    .code("WLT-" + String.format("%07d", i))
+                    .currency("XOF")
+                    .build();
+            walletRepository.save(wallet);
+
+        // 2. Génération des transactions fictives liées à ce portefeuille
+            for (int j = 1; j <= eventsPerWallet; j++) {
+                TransactionHistory tx = TransactionHistory.builder()
+                        .walletPhone(phone)
+                        .amount(new BigDecimal(random.nextInt(5000) + 500))
+                        .fees(BigDecimal.ZERO)
+                        .type(TransactionType.DEPOSIT)
+                        .description("Seed transaction n°" + j)
+                        .timestamp(LocalDateTime.now())
+                        .build();
+                transactionRepository.save(tx);
+            }
+        }
+    }
 }

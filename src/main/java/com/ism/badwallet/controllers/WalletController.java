@@ -24,4 +24,10 @@ public class WalletController {
     public ResponseEntity<Wallet> withdraw(@RequestBody WithdrawRequest request) {
         return ResponseEntity.ok(walletService.withdraw(request));
     }
+    
+    @PostMapping("/seed")
+    public ResponseEntity<String> seed(@RequestParam int numWallets, @RequestParam int eventsPerWallet) {
+        walletService.seedDatabase(numWallets, eventsPerWallet);
+        return ResponseEntity.accepted().body("Le seeding de la base de données a démarré de manière asynchrone.");
+    }
 }
