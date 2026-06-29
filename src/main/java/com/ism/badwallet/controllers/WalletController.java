@@ -2,6 +2,7 @@ package com.ism.badwallet.controllers;
 
 import com.ism.badwallet.dtos.DepositRequest;
 import com.ism.badwallet.dtos.WithdrawRequest;
+import com.ism.badwallet.entities.TransactionHistory;
 import com.ism.badwallet.entities.Wallet;
 import com.ism.badwallet.services.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -71,5 +72,14 @@ public class WalletController {
     public ResponseEntity<Void> payFactures(@RequestBody com.ism.badwallet.dtos.PaymentRequest request) {
         walletService.payFacture(request);
         return ResponseEntity.ok().build();
+    }
+
+    
+    @GetMapping("/{phoneNumber}/transactions")
+    public ResponseEntity<org.springframework.data.domain.Page<TransactionHistory>> getTransactions(
+            @PathVariable String phoneNumber,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(walletService.getTransactions(phoneNumber, org.springframework.data.domain.PageRequest.of(page, size)));
     }
 }

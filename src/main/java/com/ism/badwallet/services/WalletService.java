@@ -186,4 +186,7 @@ public class WalletService {
                 .timestamp(LocalDateTime.now())
                 .build());
     }
+    public org.springframework.data.domain.Page<TransactionHistory> getTransactions(String phone, org.springframework.data.domain.Pageable pageable) {
+        return transactionRepository.findByWalletPhone(phone, pageable);
+    }
 }
