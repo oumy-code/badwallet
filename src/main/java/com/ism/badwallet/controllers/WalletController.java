@@ -42,4 +42,15 @@ public class WalletController {
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(walletService.getAllWallets(org.springframework.data.domain.PageRequest.of(page, size)));
     }
+    
+    @GetMapping("/{phoneNumber}")
+    public ResponseEntity<Wallet> getByPhone(@PathVariable String phoneNumber) {
+        return ResponseEntity.ok(walletService.getWalletByPhone(phoneNumber));
+    }
+
+    
+    @GetMapping("/{phoneNumber}/balance")
+    public ResponseEntity<java.math.BigDecimal> getBalance(@PathVariable String phoneNumber) {
+        return ResponseEntity.ok(walletService.getBalance(phoneNumber));
+    }
 }

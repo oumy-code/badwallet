@@ -115,4 +115,12 @@ public class WalletService {
     public org.springframework.data.domain.Page<Wallet> getAllWallets(org.springframework.data.domain.Pageable pageable) {
         return walletRepository.findAll(pageable);
     }
+    public Wallet getWalletByPhone(String phone) {
+        return walletRepository.findByPhoneNumber(phone)
+                .orElseThrow(() -> new RuntimeException("Portefeuille non trouvé"));
+    }
+
+    public java.math.BigDecimal getBalance(String phone) {
+        return this.getWalletByPhone(phone).getBalance();
+    }
 }
