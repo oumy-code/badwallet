@@ -112,4 +112,7 @@ public class WalletService {
                 
         return walletRepository.save(wallet);
     }
+    public org.springframework.data.domain.Page<Wallet> getAllWallets(org.springframework.data.domain.Pageable pageable) {
+        return walletRepository.findAll(pageable);
+    }
 }

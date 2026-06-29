@@ -35,4 +35,11 @@ public class WalletController {
     public ResponseEntity<Wallet> create(@RequestBody com.ism.badwallet.dtos.WalletCreationRequest request) {
         return ResponseEntity.ok(walletService.createWallet(request));
     }
+    
+    @GetMapping
+    public ResponseEntity<org.springframework.data.domain.Page<Wallet>> list(
+            @RequestParam(defaultValue = "0") int page, 
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(walletService.getAllWallets(org.springframework.data.domain.PageRequest.of(page, size)));
+    }
 }
