@@ -157,36 +157,31 @@ public class WalletService {
                 .build());
     }
     public void payFacture(PaymentRequest request) {
-      
-        Wallet wallet = walletRepository.findByPhoneNumber(request.getPhoneNumber())
-                .orElseThrow(() -> new RuntimeException("Portefeuille non trouvé"));
+    Wallet wallet = walletRepository.findByPhoneNumber(request.getPhoneNumber())
+            .orElseThrow(() -> new RuntimeException("Portefeuille non trouvé"));
 
-       
-        if (wallet.getBalance().compareTo(request.getAmount()) < 0) {
+    BigDecimal amount = request.getAmount() != null ? request.getAmount() : BigDecimal.ZERO;
+
+    if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        if (wallet.getBalance().compareTo(amount) < 0) {
             throw new RuntimeException("Solde insuffisant pour régler cette facture");
         }
-
-       
-        wallet.setBalance(wallet.getBalance().subtract(request.getAmount()));
+        wallet.setBalance(wallet.getBalance().subtract(amount));
         walletRepository.save(wallet);
-
-       
-        String desc = "Paiement service " + request.getServiceName();
-        if (request.getFactureReferences() != null && !request.getFactureReferences().isEmpty()) {
-            desc += " (Factures: " + String.join(", ", request.getFactureReferences()) + ")";
-        }
-
-       
-        transactionRepository.save(TransactionHistory.builder()
-                .walletPhone(wallet.getPhoneNumber())
-                .amount(request.getAmount())
-                .fees(BigDecimal.ZERO)
-                .type(TransactionType.PAYMENT)
-                .description(desc)
-                .timestamp(LocalDateTime.now())
-                .build());
     }
-    public org.springframework.data.domain.Page<TransactionHistory> getTransactions(String phone, org.springframework.data.domain.Pageable pageable) {
-        return transactionRepository.findByWalletPhone(phone, pageable);
+
+    String desc = "Paiement service " + request.getServiceName();
+    if (request.getFactureReferences() != null && !request.getFactureReferences().isEmpty()) {
+        desc += " (Factures: " + String.join(", ", request.getFactureReferences()) + ")";
     }
+
+    transactionRepository.save(TransactionHistory.builder()
+            .walletPhone(wallet.getPhoneNumber())
+            .amount(amount)
+            .fees(BigDecimal.ZERO)
+            .type(TransactionType.PAYMENT)
+            .description(desc)
+            .timestamp(LocalDateTime.now())
+            .build());
+}
 }
