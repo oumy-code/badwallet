@@ -1,4 +1,9 @@
 @walletHost = http://localhost:8080
+@paymentHost = http://localhost:8081
+
+# ==========================================
+# PARTIE 1 : badwallet-api (Port 8080)
+# ==========================================
 
 ### 1.1 Seeder la base de données badwallet-api (Async)
 POST {{walletHost}}/api/wallets/seed?numWallets=10&eventsPerWallet=100
@@ -28,7 +33,7 @@ Content-Type: application/json
 GET {{walletHost}}/api/wallets/+221770000003/balance
 Content-Type: application/json
 
-### 1.6 Effectuer un Dépôt
+### 1.6 Effectuer un Dépôt (CREDIT_CARD, WALLET_TARGET)
 POST {{walletHost}}/api/wallets/1/deposit
 Content-Type: application/json
 
@@ -56,7 +61,7 @@ Content-Type: application/json
   "amount": 2000.00
 }
 
-### 1.9 Payer une facture du mois en cours
+### 1.9 Payer une facture du mois encours (ISM, WOYAFAL) via externe api payment-service
 POST {{walletHost}}/api/wallets/pay
 Content-Type: application/json
 
@@ -78,4 +83,21 @@ Content-Type: application/json
 
 ### 1.11 Consulter l'historique des transactions par téléphone
 GET {{walletHost}}/api/wallets/+221770000003/transactions
+Content-Type: application/json
+
+
+# ==========================================
+# PARTIE 2 : Proxy API dans badwallet-api (Port 8080)
+# ==========================================
+
+### 2.2 Consulter les factures impayées du mois en cours
+GET {{walletHost}}/api/external/factures/WLT-0000003/current
+Content-Type: application/json
+
+### 2.3 Consulter les factures impayées du mois en cours filtrées par unité de paiement (ex: WOYAFAL)
+GET {{walletHost}}/api/external/factures/WLT-0000003/current?unite=WOYAFAL
+Content-Type: application/json
+
+### 2.4 Consulter les factures impayées sur une période
+GET {{walletHost}}/api/external/factures/WLT-0000003/periode?debut=2026-05-01&fin=2026-07-01
 Content-Type: application/json
