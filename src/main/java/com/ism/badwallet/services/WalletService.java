@@ -2,6 +2,7 @@ package com.ism.badwallet.services;
 
 import com.ism.badwallet.dtos.WalletCreationRequest;
 import com.ism.badwallet.dtos.DepositRequest;
+import com.ism.badwallet.dtos.PaymentRequest;
 import com.ism.badwallet.dtos.TransferRequest;
 import com.ism.badwallet.dtos.WithdrawRequest;
 import com.ism.badwallet.entities.*;
@@ -152,6 +153,36 @@ public class WalletService {
                 .fees(BigDecimal.ZERO)
                 .type(TransactionType.TRANSFER)
                 .description("Transfert envoyé à " + receiver.getPhoneNumber())
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+    public void payFacture(PaymentRequest request) {
+      
+        Wallet wallet = walletRepository.findByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new RuntimeException("Portefeuille non trouvé"));
+
+       
+        if (wallet.getBalance().compareTo(request.getAmount()) < 0) {
+            throw new RuntimeException("Solde insuffisant pour régler cette facture");
+        }
+
+       
+        wallet.setBalance(wallet.getBalance().subtract(request.getAmount()));
+        walletRepository.save(wallet);
+
+       
+        String desc = "Paiement service " + request.getServiceName();
+        if (request.getFactureReferences() != null && !request.getFactureReferences().isEmpty()) {
+            desc += " (Factures: " + String.join(", ", request.getFactureReferences()) + ")";
+        }
+
+       
+        transactionRepository.save(TransactionHistory.builder()
+                .walletPhone(wallet.getPhoneNumber())
+                .amount(request.getAmount())
+                .fees(BigDecimal.ZERO)
+                .type(TransactionType.PAYMENT)
+                .description(desc)
                 .timestamp(LocalDateTime.now())
                 .build());
     }

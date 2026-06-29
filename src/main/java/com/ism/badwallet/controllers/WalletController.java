@@ -58,4 +58,18 @@ public class WalletController {
         walletService.transfer(request);
         return ResponseEntity.ok().build();
     }
+
+    
+    @PostMapping("/pay")
+    public ResponseEntity<Void> pay(@RequestBody com.ism.badwallet.dtos.PaymentRequest request) {
+        walletService.payFacture(request);
+        return ResponseEntity.ok().build();
+    }
+
+    
+    @PostMapping("/pay-factures")
+    public ResponseEntity<Void> payFactures(@RequestBody com.ism.badwallet.dtos.PaymentRequest request) {
+        walletService.payFacture(request);
+        return ResponseEntity.ok().build();
+    }
 }
