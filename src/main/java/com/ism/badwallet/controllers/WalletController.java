@@ -53,4 +53,9 @@ public class WalletController {
     public ResponseEntity<java.math.BigDecimal> getBalance(@PathVariable String phoneNumber) {
         return ResponseEntity.ok(walletService.getBalance(phoneNumber));
     }
+    @PostMapping("/transfer")
+    public ResponseEntity<Void> transfer(@RequestBody com.ism.badwallet.dtos.TransferRequest request) {
+        walletService.transfer(request);
+        return ResponseEntity.ok().build();
+    }
 }

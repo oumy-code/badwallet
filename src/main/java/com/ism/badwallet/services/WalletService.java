@@ -1,7 +1,8 @@
 package com.ism.badwallet.services;
 
-
+import com.ism.badwallet.dtos.WalletCreationRequest;
 import com.ism.badwallet.dtos.DepositRequest;
+import com.ism.badwallet.dtos.TransferRequest;
 import com.ism.badwallet.dtos.WithdrawRequest;
 import com.ism.badwallet.entities.*;
 import com.ism.badwallet.enums.TransactionType;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
-import com.ism.badwallet.dtos.WalletCreationRequest;
+
 
 @Service
 @RequiredArgsConstructor
@@ -86,7 +87,7 @@ public class WalletService {
                     .build();
             walletRepository.save(wallet);
 
-        // 2. Génération des transactions fictives liées à ce portefeuille
+       
             for (int j = 1; j <= eventsPerWallet; j++) {
                 TransactionHistory tx = TransactionHistory.builder()
                         .walletPhone(phone)
@@ -122,5 +123,36 @@ public class WalletService {
 
     public java.math.BigDecimal getBalance(String phone) {
         return this.getWalletByPhone(phone).getBalance();
+    }
+    public void transfer(TransferRequest request) {
+        // 1. Récupérer le portefeuille de l'émetteur
+        Wallet sender = walletRepository.findByPhoneNumber(request.getSenderPhone())
+                .orElseThrow(() -> new RuntimeException("Émetteur non trouvé"));
+                
+       
+        Wallet receiver = walletRepository.findByPhoneNumber(request.getReceiverPhone())
+                .orElseThrow(() -> new RuntimeException("Récepteur non trouvé"));
+
+       
+        if (sender.getBalance().compareTo(request.getAmount()) < 0) {
+            throw new RuntimeException("Solde insuffisant pour effectuer le transfert");
+        }
+
+       
+        sender.setBalance(sender.getBalance().subtract(request.getAmount()));
+        receiver.setBalance(receiver.getBalance().add(request.getAmount()));
+
+        walletRepository.save(sender);
+        walletRepository.save(receiver);
+
+       
+        transactionRepository.save(TransactionHistory.builder()
+                .walletPhone(sender.getPhoneNumber())
+                .amount(request.getAmount())
+                .fees(BigDecimal.ZERO)
+                .type(TransactionType.TRANSFER)
+                .description("Transfert envoyé à " + receiver.getPhoneNumber())
+                .timestamp(LocalDateTime.now())
+                .build());
     }
 }
